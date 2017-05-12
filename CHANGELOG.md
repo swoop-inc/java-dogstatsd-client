@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Swoop Fork
+==========
+* Refactored for Java 8 only.
+* Refactored codebase and APIs to be more extendable and DRY.
+  * Leveraging Java 8 default interface methods to simplify implementations.
+  * `StringMessageStatsDClient` abstract class now makes it easier to create custom clients. Corresponding test class can also be extended.
+  * `NonBlockingStatsDClient` now extends from `StringMessageStatsDClient`.
+  * `StatsDClient` now extends [`Closeable`](https://docs.oracle.com/javase/7/docs/api/java/io/Closeable.html) for easier use with Java 8's try-with-resources.
+* Implemented LMAX disruptor version extending from `StringMessageStatsDClient`.
+
 2.3 / 2016.10.21
 ================
 * [BUGFIX] Reduce packet size to avoid fragmentation, see [#17](https://github.com/DataDog/java-dogstatsd-client/pull/17).

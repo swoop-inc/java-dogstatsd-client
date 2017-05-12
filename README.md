@@ -1,23 +1,26 @@
-java-dogstatsd-client
-==================
+statsd-client
+=============
 
-A statsd client library implemented in Java.  Allows for Java applications to easily communicate with statsd.
+[![Build Status](https://travis-ci.org/swoop-inc/statsd-client.svg?branch=swoop)](https://travis-ci.org/swoop-inc/statsd-client/builds) (**`swoop` branch status**)
 
-This version was originally forked from [java-dogstatsd-client](https://github.com/indeedeng/java-dogstatsd-client) and [java-statsd-client](https://github.com/youdevise/java-statsd-client) but it is now the canonical home for the java-dogstatsd-client.  Collaborating with the former upstream projects we have now combined efforts to provide a single release.
+A statsd client library implemented in Java. Allows for Java applications to easily communicate with statsd.
+
+This version was originally forked from [DataDog/java-dogstatsd-client](https://github.com/DataDog/java-dogstatsd-client), [java-dogstatsd-client](https://github.com/indeedeng/java-dogstatsd-client) and [java-statsd-client](https://github.com/youdevise/java-statsd-client) but it is now the canonical home for swoop's statsd client.
 
 See [CHANGELOG.md](CHANGELOG.md) for changes.
 
-Downloads
----------
-The client jar is distributed via maven central, and can be downloaded [here](http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.datadoghq%20a%3Ajava-dogstatsd-client).
+Maven Integration
+-----------------
 
 ```xml
 <dependency>
-    <groupId>com.datadoghq</groupId>
-    <artifactId>java-dogstatsd-client</artifactId>
-    <version>2.3</version>
+    <groupId>com.swoop</groupId>
+    <artifactId>statsd-client</artifactId>
+    <version>${swoop.statsd-client.version}</version>
 </dependency>
 ```
+
+Releases can be found here: <https://github.com/Shopximity/swoop-rest/releases>
 
 Usage
 -----
@@ -28,7 +31,7 @@ import com.timgroup.statsd.NonBlockingStatsDClient;
 
 public class Foo {
 
-  private static final StatsDClient statsd = new NonBlockingStatsDClient(
+  private static final StatsDClient statsd = new DisruptorStatsDClient(
     "my.prefix",                          /* prefix to any stats; may be null or empty string */
     "statsd-host",                        /* common case: localhost */
     8125,                                 /* port */

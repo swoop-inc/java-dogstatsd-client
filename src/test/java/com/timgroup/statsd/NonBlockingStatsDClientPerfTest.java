@@ -32,6 +32,7 @@ public final class NonBlockingStatsDClientPerfTest {
         server.close();
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     @Test(timeout=30000)
     public void perf_test() throws Exception {
 
@@ -46,7 +47,7 @@ public final class NonBlockingStatsDClientPerfTest {
         for(int i = 0; i < 20000 && server.messagesReceived().size() < testSize; i += 50) {
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException ex) {}
+            } catch (InterruptedException ignored) {}
         }
 
         assertEquals(testSize, server.messagesReceived().size());

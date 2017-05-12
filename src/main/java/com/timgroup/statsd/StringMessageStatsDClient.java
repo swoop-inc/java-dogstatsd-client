@@ -8,7 +8,18 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
+ * Abstract implementation of {@link StatsDClient} that requires a minimal set of
+ * methods to be implemented in order to support all operations:
  *
+ * <ul>
+ *     <li>{@link #send(String)}</li>
+ *     <li>{@link #getPrefix()}</li>
+ *     <li>{@link #getConstantTagsRendered()} (optional)</li>
+ * </ul>
+ *
+ * Implementation classes should typically insert the message into a queue and have a
+ * separate thread processing off the queue. However, other implementation can handle it
+ * differently.
  */
 public abstract class StringMessageStatsDClient implements StatsDClient {
     /**

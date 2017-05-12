@@ -1,5 +1,7 @@
 package com.timgroup.statsd;
 
+import java.io.Closeable;
+
 /**
  * Describes a client connection to a StatsD server, which may be used to post metrics
  * in the form of counters, timers, and gauges.
@@ -15,13 +17,7 @@ package com.timgroup.statsd;
  * @author Tom Denley
  *
  */
-public interface StatsDClient {
-
-    /**
-     * Cleanly shut down this StatsD client. This method may throw an exception if
-     * the socket cannot be closed.
-     */
-    void stop();
+public interface StatsDClient extends Closeable {
 
     /**
      * Adjusts the specified counter by a given delta.
@@ -69,7 +65,9 @@ public interface StatsDClient {
      * @param tags
      *     array of tags to be added to the data
      */
-    void incrementCounter(String aspect, String... tags);
+    default void incrementCounter(String aspect, String... tags) {
+        count(aspect, 1, tags);
+    }
     
     /**
      * Increments the specified counter by one.
@@ -85,17 +83,23 @@ public interface StatsDClient {
      * @param tags
      *     array of tags to be added to the data
      */
-    void incrementCounter(String aspect, double sampleRate, String... tags);
+    default void incrementCounter(String aspect, double sampleRate, String... tags) {
+        count(aspect, 1, sampleRate, tags);
+    }
 
     /**
      * Convenience method equivalent to {@link #incrementCounter(String, String[])}.
      */
-    void increment(String aspect, String... tags);
+    default void increment(String aspect, String... tags) {
+        incrementCounter(aspect, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #incrementCounter(String, double, String[])}.
      */
-    void increment(String aspect, double sampleRate, String...tags);
+    default void increment(String aspect, double sampleRate, String...tags) {
+        incrementCounter(aspect, sampleRate, tags);
+    }
 
     /**
      * Decrements the specified counter by one.
@@ -109,7 +113,9 @@ public interface StatsDClient {
      * @param tags
      *     array of tags to be added to the data
      */
-    void decrementCounter(String aspect, String... tags);
+    default void decrementCounter(String aspect, String... tags) {
+        count(aspect, -1, tags);
+    }
     
     /**
      * Decrements the specified counter by one.
@@ -125,17 +131,23 @@ public interface StatsDClient {
      * @param tags
      *     array of tags to be added to the data
      */
-    void decrementCounter(String aspect, double sampleRate, String... tags);
+    default void decrementCounter(String aspect, double sampleRate, String... tags) {
+        count(aspect, -1, sampleRate, tags);
+    }
 
     /**
      * Convenience method equivalent to {@link #decrementCounter(String, String[])}.
      */
-    void decrement(String aspect, String... tags);
+    default void decrement(String aspect, String... tags) {
+        decrementCounter(aspect, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #decrementCounter(String, double, String[])}.
      */
-    void decrement(String aspect, double sampleRate, String... tags);
+    default void decrement(String aspect, double sampleRate, String... tags) {
+        decrementCounter(aspect, sampleRate, tags);
+    }
 
     /**
      * Records the latest fixed value for the specified named gauge.
@@ -170,12 +182,16 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordGaugeValue(String, double, String[])}.
      */
-    void gauge(String aspect, double value, String... tags);
+    default void gauge(String aspect, double value, String... tags) {
+        recordGaugeValue(aspect, value, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #recordGaugeValue(String, double, double, String[])}.
      */
-    void gauge(String aspect, double value, double sampleRate, String... tags);
+    default void gauge(String aspect, double value, double sampleRate, String... tags) {
+        recordGaugeValue(aspect, value, sampleRate, tags);
+    }
 
     /**
      * Records the latest fixed value for the specified named gauge.
@@ -210,12 +226,16 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordGaugeValue(String, long, String[])}.
      */
-    void gauge(String aspect, long value, String... tags);
+    default void gauge(String aspect, long value, String... tags) {
+        recordGaugeValue(aspect, value, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #recordGaugeValue(String, long, double, String[])}.
      */
-    void gauge(String aspect, long value, double sampleRate, String... tags);
+    default void gauge(String aspect, long value, double sampleRate, String... tags) {
+        recordGaugeValue(aspect, value, sampleRate, tags);
+    }
 
     /**
      * Records an execution time in milliseconds for the specified named operation.
@@ -254,12 +274,16 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordExecutionTime(String, long, String[])}.
      */
-    void time(String aspect, long value, String... tags);
+    default void time(String aspect, long value, String... tags) {
+        recordExecutionTime(aspect, value, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #recordExecutionTime(String, long, double, String[])}.
      */
-    void time(String aspect, long value, double sampleRate, String... tags);
+    default void time(String aspect, long value, double sampleRate, String... tags) {
+        recordExecutionTime(aspect, value, sampleRate, tags);
+    }
 
     /**
      * Records a value for the specified named histogram.
@@ -298,12 +322,16 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordHistogramValue(String, double, String[])}.
      */
-    void histogram(String aspect, double value, String... tags);
+    default void histogram(String aspect, double value, String... tags) {
+        recordHistogramValue(aspect, value, tags);
+    }
 
     /**
      * Convenience method equivalent to {@link #recordHistogramValue(String, double, double, String[])}.
      */
-    void histogram(String aspect, double value, double sampleRate, String... tags);
+    default void histogram(String aspect, double value, double sampleRate, String... tags) {
+        recordHistogramValue(aspect, value, sampleRate, tags);
+    }
     
     /**
      * Records a value for the specified named histogram.
@@ -342,12 +370,16 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordHistogramValue(String, long, String[])}.
      */
-    void histogram(String aspect, long value, String... tags);
+    default void histogram(String aspect, long value, String... tags) {
+        recordHistogramValue(aspect, value, tags);
+    }
     
     /**
      * Convenience method equivalent to {@link #recordHistogramValue(String, long, double, String[])}.
      */
-    void histogram(String aspect, long value, double sampleRate, String... tags);
+    default void histogram(String aspect, long value, double sampleRate, String... tags) {
+        recordHistogramValue(aspect, value, sampleRate, tags);
+    }
 
     /**
      * Records an event
@@ -376,7 +408,9 @@ public interface StatsDClient {
     /**
      * Convenience method equivalent to {@link #recordServiceCheckRun(ServiceCheck sc)}.
      */
-    void serviceCheck(ServiceCheck sc);
+    default void serviceCheck(ServiceCheck sc) {
+        recordServiceCheckRun(sc);
+    }
 
     /**
      * Records a value for the specified set.

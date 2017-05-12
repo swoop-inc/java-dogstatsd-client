@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 
@@ -41,7 +42,7 @@ import java.util.concurrent.*;
  */
 public class NonBlockingStatsDClient extends StringMessageStatsDClient {
 
-    public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
+    public static final Charset MESSAGE_CHARSET = StandardCharsets.UTF_8;
     private static final int PACKET_SIZE_BYTES = 1400;
     private static final StatsDClientErrorHandler NO_OP_HANDLER = e -> { /* No-op */ };
 
@@ -277,7 +278,8 @@ public class NonBlockingStatsDClient extends StringMessageStatsDClient {
             throw new StatsDClientException("Failed to start StatsD client", e);
         }
         queue = new LinkedBlockingQueue<>(queueSize);
-        executor.submit(new QueueConsumer(addressLookup));
+
+        executor.execute(new QueueConsumer(addressLookup));
     }
 
     /**
@@ -305,6 +307,7 @@ public class NonBlockingStatsDClient extends StringMessageStatsDClient {
         }
     }
 
+    @Override
     protected void send(final String message) {
         queue.offer(message);
     }

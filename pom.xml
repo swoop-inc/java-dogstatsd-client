@@ -1,13 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.datadoghq</groupId>
-  <artifactId>java-dogstatsd-client</artifactId>
+  <parent>
+    <groupId>com.swoop</groupId>
+    <artifactId>swoop-pom</artifactId>
+    <version>2.29</version>
+  </parent>
+
+  <groupId>com.swoop</groupId>
+  <artifactId>statsd-client</artifactId>
   <packaging>jar</packaging>
-  <name>java-dogstatsd-client</name>
-  <version>2.3</version>
-  <description>A tiny library allowing Java applications to communicate with DataDog statsd instances easily.</description>
-  <url>https://github.com/DataDog/java-dogstatsd-client</url>
+  <name>statsd-client</name>
+  <version>2.0-SNAPSHOT</version>
+  <description>A java library for emitting StatsD metrics</description>
+  <url>https://github.com/swoop-inc/statsd-client/tree/swoop</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,10 +29,10 @@
   </licenses>
 
   <scm>
-    <url>https://github.com/DataDog/java-dogstatsd-client</url>
-    <connection>scm:git:git://github.com/DataDog/java-dogstatsd-client.git</connection>
-    <developerConnection>scm:git:git@github.com:Datadog/java-dogstatsd-client.git</developerConnection>
-    <tag>HEAD</tag>
+    <url>https://github.com/swoop-inc/statsd-client/tree/swoop</url>
+    <connection>scm:git:git://github.com/swoop-inc/statsd-client.git</connection>
+    <developerConnection>scm:git:git@github.com:swoop-inc/statsd-client.git</developerConnection>
+    <tag>swoop</tag>
   </scm>
 
   <developers>
@@ -72,17 +78,6 @@
       <version>4.12</version>
     </dependency>
   </dependencies>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 
   <build>
     <plugins>

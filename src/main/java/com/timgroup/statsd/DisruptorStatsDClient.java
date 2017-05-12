@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DisruptorStatsDClient extends StringMessageStatsDClient {
 
+    public static final Charset MESSAGE_CHARSET = StandardCharsets.UTF_8;
     private static final int PACKET_SIZE_BYTES = 1400;
     private static final StatsDClientErrorHandler NO_OP_HANDLER = e -> {};
     private static final EventFactory<DisruptorEvent> FACTORY = DisruptorEvent::new;
@@ -145,7 +148,7 @@ public class DisruptorStatsDClient extends StringMessageStatsDClient {
         @Override
         public void onEvent(DisruptorEvent event, long sequence, boolean batchEnd) throws Exception {
             String message = event.value;
-            byte[] data = message.getBytes();
+            byte[] data = message.getBytes(MESSAGE_CHARSET);
             if (sendBuffer.remaining() < (data.length + 1)) {
                 flush();
             }

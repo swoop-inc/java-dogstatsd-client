@@ -136,6 +136,7 @@ public class NonBlockingStatsDClientTest {
         assertEquals("my.prefix.mygauge:423|g|@1.000000", server.nextMessage());
     }
 
+    @SuppressWarnings("FloatingPointLiteralPrecision")
     @Test(timeout=5000L) public void
     sends_large_double_gauge_to_statsd() throws Exception {
         client.recordGaugeValue("mygauge", 123456789012345.67890);
@@ -143,6 +144,7 @@ public class NonBlockingStatsDClientTest {
         assertEquals("my.prefix.mygauge:123456789012345.67|g", server.nextMessage());
     }
 
+    @SuppressWarnings("FloatingPointLiteralPrecision")
     @Test(timeout=5000L) public void
     sends_exact_double_gauge_to_statsd() throws Exception {
         client.recordGaugeValue("mygauge", 123.45678901234567890);

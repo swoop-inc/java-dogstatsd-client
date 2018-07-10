@@ -34,17 +34,27 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         NumberFormat numberFormatter = NumberFormat.getInstance(Locale.US);
         numberFormatter.setGroupingUsed(false);
         numberFormatter.setMaximumFractionDigits(6);
+        configureFormatter(numberFormatter);
+        return numberFormatter;
+    });
 
+    private static final ThreadLocal<NumberFormat> SAMPLE_RATE_FORMATTERS = ThreadLocal.withInitial(() -> {
+        final NumberFormat numberFormatter = NumberFormat.getInstance(Locale.US);
+        numberFormatter.setGroupingUsed(false);
+        numberFormatter.setMinimumFractionDigits(6);
+        configureFormatter(numberFormatter);
+        return numberFormatter;
+    });
+
+    private static void configureFormatter(NumberFormat numberFormatter) {
         // we need to specify a value for Double.NaN that is recognized by dogStatsD
-        if (numberFormatter instanceof DecimalFormat) { // better safe than a runtime error
+        if (numberFormatter instanceof DecimalFormat) {
             final DecimalFormat decimalFormat = (DecimalFormat) numberFormatter;
             final DecimalFormatSymbols symbols = decimalFormat.getDecimalFormatSymbols();
             symbols.setNaN("NaN");
             decimalFormat.setDecimalFormatSymbols(symbols);
         }
-
-        return numberFormatter;
-    });
+    }
 
     protected abstract void send(final String message);
 
@@ -64,7 +74,7 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
     /**
      * Generate a suffix conveying the given tag list to the client
      */
-    public String tagString(final String[] tags) {
+    private String tagString(final String[] tags) {
         return tagString(tags, getConstantTagsRendered());
     }
 
@@ -78,7 +88,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         if (isUnsampledEvent(sampleRate)) {
             return;
         }
-        send(String.format("%s%s:%d|c|@%f%s", getPrefix(), aspect, delta, sampleRate, tagString(tags)));
+        send(String.format("%s%s:%d|c|@%s%s", getPrefix(), aspect, delta,
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -92,8 +103,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         if (isUnsampledEvent(sampleRate)) {
             return;
         }
-        send(String.format("%s%s:%s|g|@%f%s", getPrefix(), aspect, NUMBER_FORMATTERS.get().format(value),
-                sampleRate, tagString(tags)));
+        send(String.format("%s%s:%s|g|@%s%s", getPrefix(), aspect, NUMBER_FORMATTERS.get().format(value),
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -106,7 +117,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         if (isUnsampledEvent(sampleRate)) {
             return;
         }
-        send(String.format("%s%s:%d|g|@%f%s", getPrefix(), aspect, value, sampleRate, tagString(tags)));
+        send(String.format("%s%s:%d|g|@%s%s", getPrefix(), aspect, value,
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -119,7 +131,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         if (isUnsampledEvent(sampleRate)) {
             return;
         }
-        send(String.format("%s%s:%d|ms|@%f%s", getPrefix(), aspect, timeInMs, sampleRate, tagString(tags)));
+        send(String.format("%s%s:%d|ms|@%s%s", getPrefix(), aspect, timeInMs,
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -135,8 +148,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         }
 
         // Intentionally using %s rather than %f here to avoid padding with extra 0s to represent precision
-        send(String.format("%s%s:%s|h|@%f%s", getPrefix(), aspect, NUMBER_FORMATTERS.get().format(value),
-                sampleRate, tagString(tags)));
+        send(String.format("%s%s:%s|h|@%s%s", getPrefix(), aspect, NUMBER_FORMATTERS.get().format(value),
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -149,7 +162,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         if (isUnsampledEvent(sampleRate)) {
             return;
         }
-        send(String.format("%s%s:%d|h|@%f%s", getPrefix(), aspect, value, sampleRate, tagString(tags)));
+        send(String.format("%s%s:%d|h|@%s%s", getPrefix(), aspect, value,
+                SAMPLE_RATE_FORMATTERS.get().format(sampleRate), tagString(tags)));
     }
 
     @Override
@@ -183,11 +197,11 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
         send(String.format("%s%s:%s|s%s", getPrefix(), aspect, value, tagString(tags)));
     }
 
-    protected boolean isUnsampledEvent(double sampleRate) {
+    private boolean isUnsampledEvent(double sampleRate) {
         return sampleRate != 1.0 && ThreadLocalRandom.current().nextDouble() > sampleRate;
     }
 
-    protected String eventMap(final Event event) {
+    private String eventMap(final Event event) {
         final StringBuilder res = new StringBuilder();
 
         final long millisSinceEpoch = event.getMillisSinceEpoch();
@@ -221,8 +235,8 @@ public abstract class StringMessageStatsDClient implements StatsDClient {
     /**
      * Generate a suffix conveying the given tag list to the client
      */
-    public static String tagString(String[] tags, String tagPrefix) {
-        List<String> components = new LinkedList<>();
+    static String tagString(String[] tags, String tagPrefix) {
+        List<String> components = new ArrayList<>();
         components.add(tagPrefix);
 
         if (tags != null) {

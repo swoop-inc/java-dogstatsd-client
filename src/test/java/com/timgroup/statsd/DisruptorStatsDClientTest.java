@@ -39,7 +39,7 @@ public class DisruptorStatsDClientTest extends StringMessageStatsDClientTest {
     }
 
     @Override
-    public void recordEvent() throws Exception {
+    public void recordEvent() {
         // we need to override this test from the parent test class due to the prefix
         Event event = Event.builder()
                 .withTitle("title1")

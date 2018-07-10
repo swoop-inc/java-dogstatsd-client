@@ -8,12 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class StringMessageStatsDClientTest {
 
     private String prefix;
-    protected BlockingQueue<String> messages;
+    private BlockingQueue<String> messages;
 
     @Before
     public void setUp() throws Exception {
@@ -43,7 +42,7 @@ public class StringMessageStatsDClientTest {
             String messageReceived = messages.poll(5, TimeUnit.SECONDS);
             assertEquals(expectedMessage, messageReceived);
         } catch (InterruptedException e) {
-            fail("no message received after waiting for 5 seconds");
+            throw new AssertionError("no message received after waiting for 5 seconds", e);
         }
     }
 
@@ -57,7 +56,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void count() throws Exception {
+    public void count() {
         client().count("mycount", 24);
         assertMessageReceived("mycount:24|c");
 
@@ -69,7 +68,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void countSampled() throws Exception {
+    public void countSampled() {
         client().count("mycount", 24, 1.0);
         assertMessageReceived("mycount:24|c|@1.000000");
 
@@ -81,7 +80,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordGaugeValueDouble() throws Exception {
+    public void recordGaugeValueDouble() {
         client().recordGaugeValue("mygauge", 123.456);
         assertMessageReceived("mygauge:123.456|g");
 
@@ -93,7 +92,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordGaugeValueDoubleSampled() throws Exception {
+    public void recordGaugeValueDoubleSampled() {
         client().recordGaugeValue("mygauge", 123.456, 1.0);
         assertMessageReceived("mygauge:123.456|g|@1.000000");
 
@@ -105,7 +104,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordGaugeValueLong() throws Exception {
+    public void recordGaugeValueLong() {
         client().recordGaugeValue("mygauge", 123L, 1.0);
         assertMessageReceived("mygauge:123|g|@1.000000");
 
@@ -117,7 +116,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordGaugeValueLongSampled() throws Exception {
+    public void recordGaugeValueLongSampled() {
         client().recordGaugeValue("mygauge", 123L, 1.0);
         assertMessageReceived("mygauge:123|g|@1.000000");
 
@@ -129,7 +128,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordExecutionTime() throws Exception {
+    public void recordExecutionTime() {
         client().recordExecutionTime("mytimer", 123L);
         assertMessageReceived("mytimer:123|ms");
 
@@ -141,7 +140,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordExecutionTimeSampled() throws Exception {
+    public void recordExecutionTimeSampled() {
         client().recordExecutionTime("mytimer", 123L, 1.0);
         assertMessageReceived("mytimer:123|ms|@1.000000");
 
@@ -153,7 +152,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordHistogramValueDouble() throws Exception {
+    public void recordHistogramValueDouble() {
         client().recordHistogramValue("myhistogram", 123.456);
         assertMessageReceived("myhistogram:123.456|h");
 
@@ -165,7 +164,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordHistogramValueDoubleSampled() throws Exception {
+    public void recordHistogramValueDoubleSampled() {
         client().recordHistogramValue("myhistogram", 123.456, 1.0);
         assertMessageReceived("myhistogram:123.456|h|@1.000000");
 
@@ -177,7 +176,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordHistogramValueLong() throws Exception {
+    public void recordHistogramValueLong() {
         client().recordHistogramValue("myhistogram", 123L);
         assertMessageReceived("myhistogram:123|h");
 
@@ -189,7 +188,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordHistogramValueLongSampled() throws Exception {
+    public void recordHistogramValueLongSampled() {
         client().recordHistogramValue("myhistogram", 123L, 1.0);
         assertMessageReceived("myhistogram:123|h|@1.000000");
 
@@ -201,7 +200,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordEvent() throws Exception {
+    public void recordEvent() {
         Event event = Event.builder()
                 .withTitle("title1")
                 .withText("text1\nline2")
@@ -220,7 +219,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordServiceCheckRun() throws Exception {
+    public void recordServiceCheckRun() {
         ServiceCheck check = ServiceCheck.builder()
                 .withName("some-name")
                 .withStatus(ServiceCheck.Status.OK)
@@ -236,7 +235,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void recordSetValue() throws Exception {
+    public void recordSetValue() {
         client().recordSetValue("my-record", "some-value");
         assertMessageReceived("my-record:some-value|s");
 
@@ -245,7 +244,7 @@ public class StringMessageStatsDClientTest {
     }
 
     @Test
-    public void tagString() throws Exception {
+    public void tagString() {
         assertEquals("", StringMessageStatsDClient.tagString(null, null));
         assertEquals("", StringMessageStatsDClient.tagString(null, ""));
         assertEquals("some-prefix", StringMessageStatsDClient.tagString(null, "some-prefix"));

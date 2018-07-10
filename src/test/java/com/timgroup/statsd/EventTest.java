@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class EventTest {
     @Test
@@ -38,10 +39,10 @@ public class EventTest {
         assertEquals("title1", event.getTitle());
         assertEquals("text1", event.getText());
         assertEquals(-1, event.getMillisSinceEpoch());
-        assertEquals(null, event.getHostname());
-        assertEquals(null, event.getPriority());
-        assertEquals(null, event.getAggregationKey());
-        assertEquals(null, event.getAlertType());
+        assertNull(event.getHostname());
+        assertNull(event.getPriority());
+        assertNull(event.getAggregationKey());
+        assertNull(event.getAlertType());
     }
 
     @Test (expected = IllegalStateException.class)

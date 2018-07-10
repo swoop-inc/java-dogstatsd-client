@@ -27,13 +27,13 @@ public final class NonBlockingStatsDClientPerfTest {
     }
 
     @AfterClass
-    public static void stop() throws Exception {
+    public static void stop() {
         client.close();
         server.close();
     }
 
     @SuppressWarnings("FutureReturnValueIgnored")
-    @Test(timeout=30000)
+    @Test(timeout = 30000)
     public void perf_test() throws Exception {
 
         int testSize = 10000;

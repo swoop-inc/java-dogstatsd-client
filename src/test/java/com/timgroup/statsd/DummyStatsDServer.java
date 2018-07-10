@@ -15,14 +15,14 @@ class DummyStatsDServer {
     private final BlockingQueue<String> messagesReceived = new LinkedBlockingQueue<>();
     private final DatagramSocket server;
 
-    public DummyStatsDServer(int port) throws SocketException {
+    DummyStatsDServer(int port) throws SocketException {
         server = new DatagramSocket(port);
         Thread thread = new Thread(() -> {
             while(!server.isClosed()) {
                 try {
                     final DatagramPacket packet = new DatagramPacket(new byte[1500], 1500);
                     server.receive(packet);
-                    for(String msg : new String(packet.getData(), NonBlockingStatsDClient.MESSAGE_CHARSET).split("\n")) {
+                    for(String msg : new String(packet.getData(), NonBlockingStatsDClient.MESSAGE_CHARSET).split("\n", -1)) {
                         messagesReceived.add(msg.trim());
                     }
                 } catch (IOException ignored) {}
@@ -32,19 +32,19 @@ class DummyStatsDServer {
         thread.start();
     }
 
-    public String nextMessage() throws InterruptedException{
+    String nextMessage() throws InterruptedException{
         return messagesReceived.take();
     }
 
-    public List<String> messagesReceived() {
+    List<String> messagesReceived() {
         return new ArrayList<>(messagesReceived);
     }
 
-    public void close() {
+    void close() {
         server.close();
     }
 
-    public void clear() {
+    void clear() {
         messagesReceived.clear();
     }
 }
